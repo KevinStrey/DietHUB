@@ -1,21 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Refeicoes.css';
+import { getLocalDateString, formatDateBr } from '../../utils/date';
 
 function Nutrition() {
   const [totals, setTotals] = useState({ calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 });
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
   const [date, setDate] = useState(getLocalDateString());
-
-  // Função para obter a data local no formato YYYY-MM-DD
-  function getLocalDateString() {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,8 +20,8 @@ function Nutrition() {
         // Buscar perfil do usuário para meta de calorias
         const usuarioResp = await axios.get(`/api/usuarios/${usuarioObj.id}`);
         setUsuario(usuarioResp.data);
-        // Buscar totais do dia do backend
-        const formattedDate = formatDate(date);
+        // Buscar totais do dia do backend para a data selecionada
+        const formattedDate = date;
         const totalsResp = await axios.get(`/api/historico/usuario/${usuarioObj.id}/data/${formattedDate}`);
         const hist = totalsResp.data || {};
         setTotals({
@@ -47,15 +39,6 @@ function Nutrition() {
     };
     fetchData();
   }, [date]);
-
-  // Função para garantir o formato YYYY-MM-DD
-  function formatDate(dateObjOrString) {
-    const d = new Date(dateObjOrString);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
 
   // Metas baseadas em % das calorias
   const getMacroGoals = (usuario) => {
@@ -83,6 +66,11 @@ function Nutrition() {
 
   const percent = (value, goal) => Math.min(100, Math.round((value / goal) * 100));
 
+  // Atualizar os dados do nutrition-chart dinamicamente
+  const atualizarNutritionChart = () => {
+    fetchData();
+  };
+
   return (
     <div className="refeicoes-container">
       <div className="refeicoes-header">
@@ -90,11 +78,12 @@ function Nutrition() {
         <input
           type="date"
           value={date}
-          onChange={e => setDate(formatDate(e.target.value))}
+          onChange={e => setDate(e.target.value)}
           className="date-picker"
         />
       </div>
       <div className="nutrition-chart">
+        <h3 className="nutrition-summary-title">Resumo do Dia - {formatDateBr(date)}</h3>
         <div className="macro-bar">
           <div className="macro-label">Calorias</div>
           <div className="macro-progress">
