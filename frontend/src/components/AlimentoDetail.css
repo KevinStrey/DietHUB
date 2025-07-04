@@ -298,7 +298,7 @@
   }
   
   .alimento-actions {
-    flex-direction: column;
+    flex-direction: row;
   }
   
   .action-button {

@@ -301,17 +301,42 @@ body {
 }
 
   .macro-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-areas:
+      "label"
+      "progress"
+      "value";
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    width: 100%;
+    align-items: center;
   }
   
   .macro-label {
-    min-width: auto;
+    grid-area: label;
+    text-align: left;
+    margin-bottom: 0;
+  }
+  
+  .macro-progress {
+    grid-area: progress;
+    width: 100%;
+    height: 16px;
+    margin-bottom: 0;
   }
   
   .macro-value {
-    min-width: auto;
+    grid-area: value;
+    min-width: 0;
     text-align: left;
+    margin-bottom: 0.5rem;
+  }
+
+  .nutrition-chart {
+    padding: 1rem;
+  }
+  .nutrition-summary-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
   }
 }
