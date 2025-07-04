@@ -33,5 +33,17 @@ public class RefeicaoController {
     public ResponseEntity<List<Refeicao>> listarRefeicoesPorUsuario(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(refeicaoService.listarPorUsuario(usuarioId));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarRefeicao(@PathVariable Long id) {
+        refeicaoService.deletarRefeicao(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Refeicao> atualizarRefeicao(@PathVariable Long id, @RequestBody Refeicao refeicao) {
+        Refeicao atualizada = refeicaoService.atualizarRefeicao(id, refeicao);
+        return ResponseEntity.ok(atualizada);
+    }
 }
 

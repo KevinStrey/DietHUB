@@ -3,6 +3,7 @@ package com.diet.hub.entities;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "Refeicao")
@@ -19,11 +20,13 @@ public class Refeicao {
     @Column(name = "data")
     private LocalDate data;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "refeicao", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "refeicao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonManagedReference("refeicao-itens")
     private List<ItemRefeicao> itens;
 
 	public Long getId() {

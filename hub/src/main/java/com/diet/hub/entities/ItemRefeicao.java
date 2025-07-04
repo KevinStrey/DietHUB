@@ -15,6 +15,7 @@ public class ItemRefeicao {
 
     @ManyToOne
     @JoinColumn(name = "refeicao_id")
+    @com.fasterxml.jackson.annotation.JsonBackReference("refeicao-itens")
     private Refeicao refeicao;
 
     @ManyToOne

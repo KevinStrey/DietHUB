@@ -10,65 +10,6 @@ function Refeicoes() {
   const [selectedRefeicao, setSelectedRefeicao] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
-  // Dados de exemplo para demonstração
-  const refeicoesExemplo = [
-    {
-      id: 1,
-      nome: 'Café da Manhã',
-      horario: '08:00',
-      alimentos: [
-        { id: 1, nome: 'Ovos', quantidade: 2, calorias: 140, proteinas: 12, carboidratos: 1, gorduras: 10 },
-        { id: 2, nome: 'Aveia', quantidade: 50, calorias: 180, proteinas: 6, carboidratos: 30, gorduras: 3 },
-        { id: 3, nome: 'Banana', quantidade: 1, calorias: 105, proteinas: 1, carboidratos: 27, gorduras: 0 }
-      ],
-      totalCalorias: 425,
-      totalProteinas: 19,
-      totalCarboidratos: 58,
-      totalGorduras: 13
-    },
-    {
-      id: 2,
-      nome: 'Almoço',
-      horario: '12:30',
-      alimentos: [
-        { id: 4, nome: 'Frango', quantidade: 150, calorias: 250, proteinas: 45, carboidratos: 0, gorduras: 5 },
-        { id: 5, nome: 'Arroz', quantidade: 100, calorias: 130, proteinas: 3, carboidratos: 28, gorduras: 0 },
-        { id: 6, nome: 'Brócolis', quantidade: 80, calorias: 35, proteinas: 3, carboidratos: 7, gorduras: 0 }
-      ],
-      totalCalorias: 415,
-      totalProteinas: 51,
-      totalCarboidratos: 35,
-      totalGorduras: 5
-    },
-    {
-      id: 3,
-      nome: 'Lanche',
-      horario: '16:00',
-      alimentos: [
-        { id: 7, nome: 'Iogurte', quantidade: 200, calorias: 120, proteinas: 8, carboidratos: 15, gorduras: 4 },
-        { id: 8, nome: 'Nozes', quantidade: 30, calorias: 180, proteinas: 6, carboidratos: 4, gorduras: 18 }
-      ],
-      totalCalorias: 300,
-      totalProteinas: 14,
-      totalCarboidratos: 19,
-      totalGorduras: 22
-    },
-    {
-      id: 4,
-      nome: 'Jantar',
-      horario: '19:30',
-      alimentos: [
-        { id: 9, nome: 'Salmão', quantidade: 120, calorias: 280, proteinas: 35, carboidratos: 0, gorduras: 15 },
-        { id: 10, nome: 'Quinoa', quantidade: 80, calorias: 120, proteinas: 4, carboidratos: 22, gorduras: 2 },
-        { id: 11, nome: 'Vegetais', quantidade: 100, calorias: 50, proteinas: 3, carboidratos: 10, gorduras: 0 }
-      ],
-      totalCalorias: 450,
-      totalProteinas: 42,
-      totalCarboidratos: 32,
-      totalGorduras: 17
-    }
-  ];
-
   useEffect(() => {
     fetchRefeicoes();
     fetchAlimentos();
@@ -77,14 +18,39 @@ function Refeicoes() {
   const fetchRefeicoes = async () => {
     try {
       setLoading(true);
-      // Aqui você pode fazer uma chamada para a API
-      // const response = await axios.get(`/api/refeicoes?data=${selectedDate}`);
-      // setRefeicoes(response.data);
-      
-      // Usando dados de exemplo por enquanto
-      setRefeicoes(refeicoesExemplo);
+      // Buscar refeições do backend para o usuário logado e data selecionada
+      const usuarioStr = localStorage.getItem('user');
+      const usuario = usuarioStr ? JSON.parse(usuarioStr) : null;
+      if (!usuario || !usuario.id) {
+        setRefeicoes([]);
+        return;
+      }
+      // Buscar refeições do usuário
+      const response = await axios.get(`/api/refeicoes/usuario/${usuario.id}`);
+      // Filtrar por data selecionada e mapear para o formato esperado
+      const refeicoesFiltradas = (response.data || []).filter(r => r.data === selectedDate);
+      const refeicoesMapeadas = refeicoesFiltradas.map(refeicaoBackend => ({
+        id: refeicaoBackend.id,
+        nome: refeicaoBackend.nome,
+        horario: '', // Se quiser extrair do campo data/hora, ajuste aqui
+        alimentos: (refeicaoBackend.itens || []).map(item => ({
+          id: item.alimento.id,
+          nome: item.alimento.nome,
+          quantidade: item.quantidadeEmGramas,
+          calorias: item.alimento.calorias,
+          proteinas: item.alimento.proteinas,
+          carboidratos: item.alimento.carboidratos,
+          gorduras: item.alimento.gorduras
+        })),
+        totalCalorias: 0, // Pode calcular se quiser
+        totalProteinas: 0,
+        totalCarboidratos: 0,
+        totalGorduras: 0
+      }));
+      setRefeicoes(refeicoesMapeadas);
     } catch (error) {
       console.error('Erro ao buscar refeições:', error);
+      setRefeicoes([]);
     } finally {
       setLoading(false);
     }
@@ -113,9 +79,52 @@ function Refeicoes() {
     }
   };
 
-  const handleAddRefeicao = (refeicao) => {
-    setRefeicoes(prev => [...prev, { ...refeicao, id: Date.now() }]);
-    setShowAddModal(false);
+  const handleAddRefeicao = async (refeicao) => {
+    try {
+      // Buscar id do usuário logado
+      const usuarioStr = localStorage.getItem('user');
+      const usuario = usuarioStr ? JSON.parse(usuarioStr) : null;
+      if (!usuario || !usuario.id) {
+        alert('Usuário não encontrado. Faça login novamente.');
+        return;
+      }
+      // Montar payload para o backend
+      const payload = {
+        nome: refeicao.nome,
+        data: selectedDate,
+        usuario: { id: usuario.id },
+        itens: refeicao.alimentos.map(a => ({
+          alimento: { id: a.alimentoId || a.id },
+          quantidadeEmGramas: a.quantidade
+        }))
+      };
+      const response = await axios.post('/api/refeicoes', payload);
+      // Mapear resposta do backend para o formato esperado pelo frontend
+      const refeicaoBackend = response.data;
+      const refeicaoFrontend = {
+        id: refeicaoBackend.id,
+        nome: refeicaoBackend.nome,
+        horario: refeicao.horario || '', // O frontend pode não usar, mas mantém compatível
+        alimentos: (refeicaoBackend.itens || []).map(item => ({
+          id: item.alimento.id,
+          nome: item.alimento.nome,
+          quantidade: item.quantidadeEmGramas,
+          calorias: item.alimento.calorias,
+          proteinas: item.alimento.proteinas,
+          carboidratos: item.alimento.carboidratos,
+          gorduras: item.alimento.gorduras
+        })),
+        totalCalorias: refeicao.totalCalorias,
+        totalProteinas: refeicao.totalProteinas,
+        totalCarboidratos: refeicao.totalCarboidratos,
+        totalGorduras: refeicao.totalGorduras
+      };
+      setRefeicoes(prev => [...prev, refeicaoFrontend]);
+      setShowAddModal(false);
+    } catch (error) {
+      alert('Erro ao salvar refeição.');
+      console.error(error);
+    }
   };
 
   const handleEditRefeicao = (refeicao) => {
@@ -123,9 +132,61 @@ function Refeicoes() {
     setShowAddModal(true);
   };
 
-  const handleDeleteRefeicao = (id) => {
+  const handleDeleteRefeicao = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir esta refeição?')) {
-      setRefeicoes(prev => prev.filter(refeicao => refeicao.id !== id));
+      try {
+        await axios.delete(`/api/refeicoes/${id}`);
+        setRefeicoes(prev => prev.filter(refeicao => refeicao.id !== id));
+      } catch (error) {
+        alert('Erro ao excluir refeição.');
+        console.error(error);
+      }
+    }
+  };
+
+  const handleUpdateRefeicao = async (refeicao) => {
+    try {
+      const usuarioStr = localStorage.getItem('user');
+      const usuario = usuarioStr ? JSON.parse(usuarioStr) : null;
+      if (!usuario || !usuario.id) {
+        alert('Usuário não encontrado. Faça login novamente.');
+        return;
+      }
+      const payload = {
+        nome: refeicao.nome,
+        data: selectedDate,
+        usuario: { id: usuario.id },
+        itens: refeicao.alimentos.map(a => ({
+          alimento: { id: a.alimentoId || a.id },
+          quantidadeEmGramas: a.quantidade
+        }))
+      };
+      const response = await axios.put(`/api/refeicoes/${refeicao.id}`, payload);
+      // Mapear resposta do backend para o formato esperado pelo frontend
+      const refeicaoBackend = response.data;
+      const refeicaoFrontend = {
+        id: refeicaoBackend.id,
+        nome: refeicaoBackend.nome,
+        horario: refeicao.horario || '',
+        alimentos: (refeicaoBackend.itens || []).map(item => ({
+          id: item.alimento.id,
+          nome: item.alimento.nome,
+          quantidade: item.quantidadeEmGramas,
+          calorias: item.alimento.calorias,
+          proteinas: item.alimento.proteinas,
+          carboidratos: item.alimento.carboidratos,
+          gorduras: item.alimento.gorduras
+        })),
+        totalCalorias: refeicao.totalCalorias,
+        totalProteinas: refeicao.totalProteinas,
+        totalCarboidratos: refeicao.totalCarboidratos,
+        totalGorduras: refeicao.totalGorduras
+      };
+      setRefeicoes(prev => prev.map(r => r.id === refeicaoFrontend.id ? refeicaoFrontend : r));
+      setShowAddModal(false);
+    } catch (error) {
+      alert('Erro ao atualizar refeição.');
+      console.error(error);
     }
   };
 
@@ -241,8 +302,8 @@ function Refeicoes() {
               </div>
 
               <div className="alimentos-list">
-                {refeicao.alimentos.map((alimento) => (
-                  <div key={alimento.id} className="alimento-item">
+                {refeicao.alimentos.map((alimento, index) => (
+                  <div key={`${alimento.id}-${index}`} className="alimento-item">
                     <div className="alimento-info">
                       <span className="alimento-nome">{alimento.nome}</span>
                       <span className="alimento-quantidade">{alimento.quantidade}g</span>
@@ -275,7 +336,7 @@ function Refeicoes() {
         <RefeicaoModal
           refeicao={selectedRefeicao}
           alimentos={alimentos}
-          onSave={handleAddRefeicao}
+          onSave={selectedRefeicao ? handleUpdateRefeicao : handleAddRefeicao}
           onCancel={() => {
             setShowAddModal(false);
             setSelectedRefeicao(null);
@@ -291,7 +352,7 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
   const [formData, setFormData] = useState({
     nome: refeicao?.nome || '',
     horario: refeicao?.horario || '12:00',
-    alimentos: refeicao?.alimentos || []
+    alimentos: refeicao?.alimentos ? [...refeicao.alimentos] : []
   });
 
   const [selectedAlimento, setSelectedAlimento] = useState('');
@@ -307,7 +368,7 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
     const fator = quantidadeNum / 100; // Assumindo que os valores são por 100g
 
     const novoAlimento = {
-      id: Date.now(),
+      alimentoId: alimento.id,
       nome: alimento.nome,
       quantidade: quantidadeNum,
       calorias: Math.round(alimento.calorias * fator),
@@ -351,6 +412,7 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
 
     onSave({
       ...formData,
+      id: refeicao?.id,
       totalCalorias: totals.calorias,
       totalProteinas: totals.proteinas,
       totalCarboidratos: totals.carboidratos,
@@ -375,6 +437,7 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
                 value={formData.nome}
                 onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
                 placeholder="Ex: Café da Manhã"
+                readOnly={!!refeicao}
               />
             </div>
             <div className="form-group">
@@ -419,8 +482,8 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
             {formData.alimentos.length === 0 ? (
               <p className="no-alimentos">Nenhum alimento adicionado</p>
             ) : (
-              formData.alimentos.map(alimento => (
-                <div key={alimento.id} className="alimento-item">
+              formData.alimentos.map((alimento, index) => (
+                <div key={`${alimento.id}-${index}`} className="alimento-item">
                   <div className="alimento-info">
                     <span className="alimento-nome">{alimento.nome}</span>
                     <span className="alimento-quantidade">{alimento.quantidade}g</span>

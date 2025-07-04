@@ -27,6 +27,7 @@ public class Usuario {
     @Column(name = "caloriasDiarias")
     private Integer caloriasDiarias;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Refeicao> refeicoes;
 
