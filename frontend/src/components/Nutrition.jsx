@@ -89,28 +89,28 @@ function Nutrition() {
           <div className="macro-progress">
             <div className="macro-fill protein" style={{width: percent(totals.calorias, goals.calorias) + '%', background: '#e67e22'}}></div>
           </div>
-          <div className="macro-value">{totals.calorias} / {goals.calorias} kcal</div>
+          <div className="macro-value">{totals.calorias.toFixed(2)} / {goals.calorias.toFixed(2)} kcal</div>
         </div>
         <div className="macro-bar">
           <div className="macro-label">Proteínas</div>
           <div className="macro-progress">
             <div className="macro-fill protein" style={{width: percent(totals.proteinas, goals.proteinas) + '%'}}></div>
           </div>
-          <div className="macro-value">{totals.proteinas}g / {goals.proteinas}g</div>
+          <div className="macro-value">{totals.proteinas.toFixed(2)}g / {goals.proteinas.toFixed(2)}g</div>
         </div>
         <div className="macro-bar">
           <div className="macro-label">Carboidratos</div>
           <div className="macro-progress">
             <div className="macro-fill carbs" style={{width: percent(totals.carboidratos, goals.carboidratos) + '%'}}></div>
           </div>
-          <div className="macro-value">{totals.carboidratos}g / {goals.carboidratos}g</div>
+          <div className="macro-value">{totals.carboidratos.toFixed(2)}g / {goals.carboidratos.toFixed(2)}g</div>
         </div>
         <div className="macro-bar">
           <div className="macro-label">Gorduras</div>
           <div className="macro-progress">
             <div className="macro-fill fats" style={{width: percent(totals.gorduras, goals.gorduras) + '%'}}></div>
           </div>
-          <div className="macro-value">{totals.gorduras}g / {goals.gorduras}g</div>
+          <div className="macro-value">{totals.gorduras.toFixed(2)}g / {goals.gorduras.toFixed(2)}g</div>
         </div>
       </div>
     </div>

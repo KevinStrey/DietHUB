@@ -115,6 +115,7 @@ function Refeicoes() {
           quantidadeEmGramas: a.quantidade
         }))
       };
+      console.log('Payload sendo enviado:', payload); // Debug
       const response = await axios.post('/api/refeicoes', payload);
       // Mapear resposta do backend para o formato esperado pelo frontend
       const refeicaoBackend = response.data;
@@ -140,8 +141,8 @@ function Refeicoes() {
       setShowAddModal(false);
       atualizarResumoDia();
     } catch (error) {
-      alert('Erro ao salvar refeição.');
-      console.error(error);
+      console.error('Erro detalhado:', error.response?.data || error.message);
+      alert('Erro ao salvar refeição: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -180,6 +181,7 @@ function Refeicoes() {
           quantidadeEmGramas: a.quantidade
         }))
       };
+      console.log('Payload sendo enviado (update):', payload); // Debug
       const response = await axios.put(`/api/refeicoes/${refeicao.id}`, payload);
       // Mapear resposta do backend para o formato esperado pelo frontend
       const refeicaoBackend = response.data;
@@ -205,8 +207,8 @@ function Refeicoes() {
       setShowAddModal(false);
       atualizarResumoDia();
     } catch (error) {
-      alert('Erro ao atualizar refeição.');
-      console.error(error);
+      console.error('Erro detalhado (update):', error.response?.data || error.message);
+      alert('Erro ao atualizar refeição: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -370,7 +372,7 @@ function Refeicoes() {
                         <span className="alimento-quantidade">{alimento.quantidade}g</span>
                       </div>
                       <div className="alimento-nutrition">
-                        <span className="nutrition-value">{alimento.calorias} kcal</span>
+                        <span className="nutrition-value">{alimento.calorias.toFixed(2)} kcal</span>
                       </div>
                     </div>
                   ))}
@@ -379,12 +381,12 @@ function Refeicoes() {
                 <div className="refeicao-totals">
                   <div className="total-item">
                     <span className="total-label">Total:</span>
-                    <span className="total-calories">{Math.round(totais.calorias)} kcal</span>
+                    <span className="total-calories">{totais.calorias.toFixed(2)} kcal</span>
                   </div>
                   <div className="macros-summary">
-                    <span className="macro">P: {Math.round(totais.proteinas)}g</span>
-                    <span className="macro">C: {Math.round(totais.carboidratos)}g</span>
-                    <span className="macro">G: {Math.round(totais.gorduras)}g</span>
+                    <span className="macro">P: {totais.proteinas.toFixed(2)}g</span>
+                    <span className="macro">C: {totais.carboidratos.toFixed(2)}g</span>
+                    <span className="macro">G: {totais.gorduras.toFixed(2)}g</span>
                   </div>
                 </div>
               </div>
@@ -430,6 +432,7 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
     const fator = quantidadeNum / 100; // Assumindo que os valores são por 100g
 
     const novoAlimento = {
+      id: alimento.id,
       alimentoId: alimento.id,
       nome: alimento.nome,
       quantidade: quantidadeNum,
@@ -522,7 +525,7 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
                 <option value="">Selecione um alimento</option>
                 {alimentos.map(alimento => (
                   <option key={alimento.id} value={alimento.id}>
-                    {alimento.nome} ({alimento.calorias} kcal/100g)
+                    {alimento.nome} ({alimento.calorias.toFixed(2)} kcal/100g)
                   </option>
                 ))}
               </select>
@@ -551,7 +554,7 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
                     <span className="alimento-quantidade">{alimento.quantidade}g</span>
                   </div>
                   <div className="alimento-nutrition">
-                    <span>{alimento.calorias} kcal</span>
+                    <span className="nutrition-value">{alimento.calorias.toFixed(2)} kcal</span>
                     <button 
                       onClick={() => handleRemoveAlimento(alimento.id)}
                       className="remove-button"
@@ -570,19 +573,19 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
               <div className="totals-grid">
                 <div className="total-item">
                   <span className="total-label">Calorias:</span>
-                  <span className="total-value">{Math.round(totals.calorias)} kcal</span>
+                  <span className="total-value">{totals.calorias.toFixed(2)} kcal</span>
                 </div>
                 <div className="total-item">
                   <span className="total-label">Proteínas:</span>
-                  <span className="total-value">{Math.round(totals.proteinas)}g</span>
+                  <span className="total-value">{totals.proteinas.toFixed(2)}g</span>
                 </div>
                 <div className="total-item">
                   <span className="total-label">Carboidratos:</span>
-                  <span className="total-value">{Math.round(totals.carboidratos)}g</span>
+                  <span className="total-value">{totals.carboidratos.toFixed(2)}g</span>
                 </div>
                 <div className="total-item">
                   <span className="total-label">Gorduras:</span>
-                  <span className="total-value">{Math.round(totals.gorduras)}g</span>
+                  <span className="total-value">{totals.gorduras.toFixed(2)}g</span>
                 </div>
               </div>
             </div>

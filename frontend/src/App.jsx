@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom'
 import AlimentoList from './components/AlimentoList'
 import AlimentoDetail from './components/AlimentoDetail'
 import AlimentoForm from './components/AlimentoForm'
@@ -10,7 +10,7 @@ import Login from './components/Login'
 import './App.css'
 
 function App() {
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const [activeTab, setActiveTab] = useState('refeicoes')
   const [user, setUserState] = useState(() => {
     const saved = localStorage.getItem('user');
     return saved ? JSON.parse(saved) : null;
@@ -38,13 +38,6 @@ function App() {
           <div className="header-content">
             <h1 className="logo">🍎 DietHub</h1>
             <nav className="nav">
-              <Link
-                to="/"
-                className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
-                onClick={() => setActiveTab('dashboard')}
-              >
-                Dashboard
-              </Link>
               <Link
                 to="/alimentos"
                 className={`nav-button ${activeTab === 'alimentos' ? 'active' : ''}`}
@@ -80,6 +73,7 @@ function App() {
         {/* Main Content */}
         <main className="main-content">
           <Routes>
+            <Route path="/" element={<Navigate to="/refeicoes" replace />} />
             {/* Rotas para Alimentos */}
             <Route path="/alimentos" element={<AlimentoList />} />
             <Route path="/alimentos/novo" element={<AlimentoForm />} />

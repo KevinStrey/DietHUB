@@ -86,16 +86,16 @@ function AlimentoList() {
                 <h3>{alimento.nome}</h3>
                 <div className="alimento-stats">
                   <span className="stat">
-                    <strong>Calorias:</strong> {alimento.calorias} kcal
+                    <strong>Calorias:</strong> {alimento.calorias} kcal (100g)
                   </span>
                   <span className="stat">
-                    <strong>Proteínas:</strong> {alimento.proteinas}g
+                    <strong>Proteínas:</strong> {alimento.proteinas}g (100g)
                   </span>
                   <span className="stat">
-                    <strong>Carboidratos:</strong> {alimento.carboidratos}g
+                    <strong>Carboidratos:</strong> {alimento.carboidratos}g (100g)
                   </span>
                   <span className="stat">
-                    <strong>Gorduras:</strong> {alimento.gorduras}g
+                    <strong>Gorduras:</strong> {alimento.gorduras}g (100g)
                   </span>
                 </div>
               </div>
