@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import './Profile.css';
 
 function Profile({ user, onLogout }) {
@@ -6,6 +7,7 @@ function Profile({ user, onLogout }) {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState(user);
+  const [success, setSuccess] = useState(false);
 
   // Atualiza formData se user mudar (ex: logout/login)
   React.useEffect(() => {
@@ -39,9 +41,11 @@ function Profile({ user, onLogout }) {
     if (!validateForm()) return;
     try {
       setSaving(true);
-      // Aqui você pode fazer o PUT no backend se quiser permitir edição
-      // await axios.put(`/api/usuarios/${user.id}`, formData);
+      setSuccess(false);
+      console.log(formData);
+      await axios.put(`/api/usuarios/${user.id}`, formData);
       setIsEditing(false);
+      setSuccess(true);
     } catch (error) {
       setErrors({ submit: 'Erro ao salvar perfil. Tente novamente.' });
     } finally {
@@ -53,6 +57,7 @@ function Profile({ user, onLogout }) {
     setFormData(user);
     setErrors({});
     setIsEditing(false);
+    setSuccess(false);
   };
 
   if (!formData) {
@@ -139,12 +144,12 @@ function Profile({ user, onLogout }) {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="calorias_diarias">Calorias Diárias</label>
+                    <label htmlFor="caloriasDiarias">Calorias Diárias</label>
                     <input
                       type="number"
-                      id="calorias_diarias"
-                      name="calorias_diarias"
-                      value={formData.calorias_diarias}
+                      id="caloriasDiarias"
+                      name="caloriasDiarias"
+                      value={formData.caloriasDiarias || ''}
                       onChange={handleChange}
                     />
                   </div>
@@ -152,6 +157,11 @@ function Profile({ user, onLogout }) {
                 {errors.submit && (
                   <div className="error-message submit-error">
                     {errors.submit}
+                  </div>
+                )}
+                {success && (
+                  <div className="success-message">
+                    Perfil atualizado com sucesso!
                   </div>
                 )}
                 <div className="form-actions">
@@ -185,7 +195,7 @@ function Profile({ user, onLogout }) {
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">Calorias Diárias:</span>
-                  <span className="detail-value">{formData.calorias_diarias}</span>
+                  <span className="detail-value">{formData.caloriasDiarias}</span>
                 </div>
               </div>
             )}

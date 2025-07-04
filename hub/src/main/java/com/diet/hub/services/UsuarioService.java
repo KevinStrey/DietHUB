@@ -28,4 +28,14 @@ public class UsuarioService {
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
+
+    public Usuario atualizarUsuario(Long id, Usuario usuario) {
+        Usuario existente = buscarPorId(id);
+        existente.setNome(usuario.getNome());
+        existente.setEmail(usuario.getEmail());
+        existente.setObjetivo(usuario.getObjetivo());
+        existente.setCaloriasDiarias(usuario.getCaloriasDiarias());
+        // Adicione outros campos que podem ser atualizados, se necessário
+        return usuarioRepository.save(existente);
+    }
 }
