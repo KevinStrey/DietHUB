@@ -6,7 +6,47 @@ function Nutrition() {
   const [totals, setTotals] = useState({ calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 });
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [date, setDate] = useState(formatDate(new Date()));
+  const [date, setDate] = useState(getLocalDateString());
+
+  // Função para obter a data local no formato YYYY-MM-DD
+  function getLocalDateString() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Buscar usuário logado do localStorage
+        const usuarioStr = localStorage.getItem('user');
+        const usuarioObj = usuarioStr ? JSON.parse(usuarioStr) : null;
+        if (!usuarioObj || !usuarioObj.id) throw new Error('Usuário não encontrado');
+        // Buscar perfil do usuário para meta de calorias
+        const usuarioResp = await axios.get(`/api/usuarios/${usuarioObj.id}`);
+        setUsuario(usuarioResp.data);
+        // Buscar totais do dia do backend
+        const formattedDate = formatDate(date);
+        const totalsResp = await axios.get(`/api/historico/usuario/${usuarioObj.id}/data/${formattedDate}`);
+        const hist = totalsResp.data || {};
+        setTotals({
+          calorias: hist.totalCalorias || 0,
+          proteinas: hist.totalProteinas || 0,
+          carboidratos: hist.totalCarboidratos || 0,
+          gorduras: hist.totalGorduras || 0
+        });
+      } catch (e) {
+        setUsuario({ caloriasDiarias: 2000 });
+        setTotals({ calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [date]);
 
   // Função para garantir o formato YYYY-MM-DD
   function formatDate(dateObjOrString) {
@@ -17,54 +57,10 @@ function Nutrition() {
     return `${year}-${month}-${day}`;
   }
 
-  // Função para obter o id do usuário do localStorage (ou outro mecanismo)
-  const getUsuarioId = async () => {
-    let usuarioId = localStorage.getItem('usuarioId');
-    if (!usuarioId) {
-      // Fallback: buscar o primeiro usuário do banco
-      const resp = await axios.get('/api/usuarios');
-      if (resp.data && resp.data.length > 0) {
-        usuarioId = resp.data[0].id;
-        localStorage.setItem('usuarioId', usuarioId);
-      }
-    }
-    return usuarioId;
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const usuarioId = await getUsuarioId();
-        if (!usuarioId) throw new Error('Usuário não encontrado');
-        // Buscar dados do usuário
-        const usuarioResp = await axios.get(`/api/usuarios/${usuarioId}`);
-        setUsuario(usuarioResp.data);
-        // Garantir formato da data
-        const formattedDate = formatDate(date);
-        // Buscar totais do dia
-        const totalsResp = await axios.get(`/api/historico/usuario/${usuarioId}/data/${formattedDate}`);
-        const hist = totalsResp.data || {};
-        setTotals({
-          calorias: hist.total_calorias || 0,
-          proteinas: hist.total_proteinas || 0,
-          carboidratos: hist.total_carboidratos || 0,
-          gorduras: hist.total_gorduras || 0
-        });
-      } catch (e) {
-        setUsuario({ calorias_diarias: 2000 });
-        setTotals({ calorias: 1850, proteinas: 85, carboidratos: 220, gorduras: 65 });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [date]);
-
   // Metas baseadas em % das calorias
   const getMacroGoals = (usuario) => {
     if (!usuario) return { calorias: 2000, proteinas: 150, carboidratos: 300, gorduras: 75 };
-    const calorias = usuario.calorias_diarias || 2000;
+    const calorias = usuario.caloriasDiarias || usuario.calorias_diarias || 2000;
     // Proteínas: 30% das calorias, 1g = 4kcal
     const proteinas = Math.round((calorias * 0.3) / 4);
     // Carboidratos: 50% das calorias, 1g = 4kcal

@@ -8,7 +8,7 @@ function Refeicoes() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRefeicao, setSelectedRefeicao] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(getLocalDateString());
   const [historicoDia, setHistoricoDia] = useState(null);
 
   useEffect(() => {
@@ -233,13 +233,32 @@ function Refeicoes() {
 
   // Adicionar função utilitária para calcular totais de uma refeição
   const calcularTotaisRefeicao = (alimentos) => {
-    return alimentos.reduce((totals, alimento) => ({
-      calorias: totals.calorias + (alimento.calorias || 0),
-      proteinas: totals.proteinas + (alimento.proteinas || 0),
-      carboidratos: totals.carboidratos + (alimento.carboidratos || 0),
-      gorduras: totals.gorduras + (alimento.gorduras || 0)
-    }), { calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 });
+    return alimentos.reduce((totals, alimento) => {
+      const fator = (alimento.quantidade || 0) / 100;
+      return {
+        calorias: totals.calorias + (alimento.calorias || 0) * fator,
+        proteinas: totals.proteinas + (alimento.proteinas || 0) * fator,
+        carboidratos: totals.carboidratos + (alimento.carboidratos || 0) * fator,
+        gorduras: totals.gorduras + (alimento.gorduras || 0) * fator
+      };
+    }, { calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 });
   };
+
+  // Função para obter a data local no formato YYYY-MM-DD
+  function getLocalDateString() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // Função para formatar data YYYY-MM-DD para DD/MM/YYYY
+  function formatDateBr(dateStr) {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+  }
 
   if (loading) {
     return (
@@ -272,7 +291,7 @@ function Refeicoes() {
 
       {/* Resumo Diário */}
       <div className="daily-summary">
-        <h3>Resumo do Dia - {new Date(selectedDate).toLocaleDateString('pt-BR')}</h3>
+        <h3>Resumo do Dia - {formatDateBr(selectedDate)}</h3>
         <div className="summary-stats">
           <div className="summary-stat">
             <span className="stat-icon">🔥</span>
@@ -360,12 +379,12 @@ function Refeicoes() {
                 <div className="refeicao-totals">
                   <div className="total-item">
                     <span className="total-label">Total:</span>
-                    <span className="total-calories">{totais.calorias} kcal</span>
+                    <span className="total-calories">{Math.round(totais.calorias)} kcal</span>
                   </div>
                   <div className="macros-summary">
-                    <span className="macro">P: {totais.proteinas}g</span>
-                    <span className="macro">C: {totais.carboidratos}g</span>
-                    <span className="macro">G: {totais.gorduras}g</span>
+                    <span className="macro">P: {Math.round(totais.proteinas)}g</span>
+                    <span className="macro">C: {Math.round(totais.carboidratos)}g</span>
+                    <span className="macro">G: {Math.round(totais.gorduras)}g</span>
                   </div>
                 </div>
               </div>
@@ -551,19 +570,19 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
               <div className="totals-grid">
                 <div className="total-item">
                   <span className="total-label">Calorias:</span>
-                  <span className="total-value">{totals.calorias} kcal</span>
+                  <span className="total-value">{Math.round(totals.calorias)} kcal</span>
                 </div>
                 <div className="total-item">
                   <span className="total-label">Proteínas:</span>
-                  <span className="total-value">{totals.proteinas}g</span>
+                  <span className="total-value">{Math.round(totals.proteinas)}g</span>
                 </div>
                 <div className="total-item">
                   <span className="total-label">Carboidratos:</span>
-                  <span className="total-value">{totals.carboidratos}g</span>
+                  <span className="total-value">{Math.round(totals.carboidratos)}g</span>
                 </div>
                 <div className="total-item">
                   <span className="total-label">Gorduras:</span>
-                  <span className="total-value">{totals.gorduras}g</span>
+                  <span className="total-value">{Math.round(totals.gorduras)}g</span>
                 </div>
               </div>
             </div>

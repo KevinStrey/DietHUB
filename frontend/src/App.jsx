@@ -80,35 +80,6 @@ function App() {
         {/* Main Content */}
         <main className="main-content">
           <Routes>
-            {/* Rota para Dashboard */}
-            <Route path="/" element={
-              <div className="dashboard">
-                <h2>Dashboard</h2>
-                <div className="stats-grid">
-                  <div className="stat-card">
-                    <h3>Calorias Hoje</h3>
-                    <p className="stat-value">1,850</p>
-                    <p className="stat-target">Meta: 2,000</p>
-                  </div>
-                  <div className="stat-card">
-                    <h3>Proteínas</h3>
-                    <p className="stat-value">85g</p>
-                    <p className="stat-target">Meta: 120g</p>
-                  </div>
-                  <div className="stat-card">
-                    <h3>Carboidratos</h3>
-                    <p className="stat-value">220g</p>
-                    <p className="stat-target">Meta: 250g</p>
-                  </div>
-                  <div className="stat-card">
-                    <h3>Gorduras</h3>
-                    <p className="stat-value">65g</p>
-                    <p className="stat-target">Meta: 70g</p>
-                  </div>
-                </div>
-              </div>
-            } />
-
             {/* Rotas para Alimentos */}
             <Route path="/alimentos" element={<AlimentoList />} />
             <Route path="/alimentos/novo" element={<AlimentoForm />} />
