@@ -33,6 +33,10 @@ function AlimentoList() {
       setShowDeleteModal(false);
       setAlimentoToDelete(null);
     } catch (error) {
+      const msg = error.response?.data || 'Erro ao deletar alimento.';
+      alert(msg);
+      setShowDeleteModal(false);
+      setAlimentoToDelete(null);
       console.error('Erro ao deletar alimento:', error);
     }
   };

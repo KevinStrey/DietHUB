@@ -151,3 +151,5 @@ INSERT INTO item_refeicao (id, refeicao_id, alimento_id, quantidade_em_gramas) V
 INSERT INTO item_refeicao (id, refeicao_id, alimento_id, quantidade_em_gramas) VALUES (66, 27, 6, 80);
 INSERT INTO item_refeicao (id, refeicao_id, alimento_id, quantidade_em_gramas) VALUES (67, 28, 7, 110);
 INSERT INTO item_refeicao (id, refeicao_id, alimento_id, quantidade_em_gramas) VALUES (68, 28, 8, 90);
+
+SELECT setval('alimento_id_seq', (SELECT MAX(id) FROM alimento));

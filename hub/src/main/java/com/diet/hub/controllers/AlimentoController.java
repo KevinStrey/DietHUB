@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.diet.hub.entities.Alimento;
 import com.diet.hub.services.AlimentoService;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 
@@ -42,9 +43,15 @@ public class AlimentoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarAlimento(@PathVariable Long id) {
-        alimentoService.deletarAlimento(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletarAlimento(@PathVariable Long id) {
+        try {
+            alimentoService.deletarAlimento(id);
+            return ResponseEntity.noContent().build();
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(409).body("Não é possível excluir o alimento pois ele está sendo utilizado em uma ou mais refeições.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao excluir alimento.");
+        }
     }
 }
 
