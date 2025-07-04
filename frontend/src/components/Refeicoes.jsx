@@ -9,10 +9,12 @@ function Refeicoes() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRefeicao, setSelectedRefeicao] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [historicoDia, setHistoricoDia] = useState(null);
 
   useEffect(() => {
     fetchRefeicoes();
     fetchAlimentos();
+    fetchHistoricoDia();
   }, [selectedDate]);
 
   const fetchRefeicoes = async () => {
@@ -79,6 +81,21 @@ function Refeicoes() {
     }
   };
 
+  const fetchHistoricoDia = async () => {
+    try {
+      const usuarioStr = localStorage.getItem('user');
+      const usuario = usuarioStr ? JSON.parse(usuarioStr) : null;
+      if (!usuario || !usuario.id) {
+        setHistoricoDia(null);
+        return;
+      }
+      const response = await axios.get(`/api/historico/usuario/${usuario.id}/data/${selectedDate}`);
+      setHistoricoDia(response.data || null);
+    } catch (error) {
+      setHistoricoDia(null);
+    }
+  };
+
   const handleAddRefeicao = async (refeicao) => {
     try {
       // Buscar id do usuário logado
@@ -121,6 +138,7 @@ function Refeicoes() {
       };
       setRefeicoes(prev => [...prev, refeicaoFrontend]);
       setShowAddModal(false);
+      atualizarResumoDia();
     } catch (error) {
       alert('Erro ao salvar refeição.');
       console.error(error);
@@ -137,6 +155,7 @@ function Refeicoes() {
       try {
         await axios.delete(`/api/refeicoes/${id}`);
         setRefeicoes(prev => prev.filter(refeicao => refeicao.id !== id));
+        atualizarResumoDia();
       } catch (error) {
         alert('Erro ao excluir refeição.');
         console.error(error);
@@ -184,6 +203,7 @@ function Refeicoes() {
       };
       setRefeicoes(prev => prev.map(r => r.id === refeicaoFrontend.id ? refeicaoFrontend : r));
       setShowAddModal(false);
+      atualizarResumoDia();
     } catch (error) {
       alert('Erro ao atualizar refeição.');
       console.error(error);
@@ -199,7 +219,27 @@ function Refeicoes() {
     }), { calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 });
   };
 
-  const dailyTotals = calculateDailyTotals();
+  const dailyTotals = historicoDia ? {
+    calorias: Math.round(historicoDia.totalCalorias || 0),
+    proteinas: Math.round(historicoDia.totalProteinas || 0),
+    carboidratos: Math.round(historicoDia.totalCarboidratos || 0),
+    gorduras: Math.round(historicoDia.totalGorduras || 0)
+  } : { calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 };
+
+  // Atualizar o resumo do dia após adicionar, editar ou excluir refeição
+  const atualizarResumoDia = () => {
+    fetchHistoricoDia();
+  };
+
+  // Adicionar função utilitária para calcular totais de uma refeição
+  const calcularTotaisRefeicao = (alimentos) => {
+    return alimentos.reduce((totals, alimento) => ({
+      calorias: totals.calorias + (alimento.calorias || 0),
+      proteinas: totals.proteinas + (alimento.proteinas || 0),
+      carboidratos: totals.carboidratos + (alimento.carboidratos || 0),
+      gorduras: totals.gorduras + (alimento.gorduras || 0)
+    }), { calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 });
+  };
 
   if (loading) {
     return (
@@ -278,56 +318,59 @@ function Refeicoes() {
             </button>
           </div>
         ) : (
-          refeicoes.map((refeicao) => (
-            <div key={refeicao.id} className="refeicao-card">
-              <div className="refeicao-header">
-                <div className="refeicao-info">
-                  <h3>{refeicao.nome}</h3>
-                  <span className="refeicao-time">{refeicao.horario}</span>
-                </div>
-                <div className="refeicao-actions">
-                  <button 
-                    onClick={() => handleEditRefeicao(refeicao)}
-                    className="action-button edit"
-                  >
-                    ✏️
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteRefeicao(refeicao.id)}
-                    className="action-button delete"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-
-              <div className="alimentos-list">
-                {refeicao.alimentos.map((alimento, index) => (
-                  <div key={`${alimento.id}-${index}`} className="alimento-item">
-                    <div className="alimento-info">
-                      <span className="alimento-nome">{alimento.nome}</span>
-                      <span className="alimento-quantidade">{alimento.quantidade}g</span>
-                    </div>
-                    <div className="alimento-nutrition">
-                      <span className="nutrition-value">{alimento.calorias} kcal</span>
-                    </div>
+          refeicoes.map((refeicao) => {
+            const totais = calcularTotaisRefeicao(refeicao.alimentos);
+            return (
+              <div key={refeicao.id} className="refeicao-card">
+                <div className="refeicao-header">
+                  <div className="refeicao-info">
+                    <h3>{refeicao.nome}</h3>
+                    <span className="refeicao-time">{refeicao.horario}</span>
                   </div>
-                ))}
-              </div>
+                  <div className="refeicao-actions">
+                    <button 
+                      onClick={() => handleEditRefeicao(refeicao)}
+                      className="action-button edit"
+                    >
+                      ✏️
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteRefeicao(refeicao.id)}
+                      className="action-button delete"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
 
-              <div className="refeicao-totals">
-                <div className="total-item">
-                  <span className="total-label">Total:</span>
-                  <span className="total-calories">{refeicao.totalCalorias} kcal</span>
+                <div className="alimentos-list">
+                  {refeicao.alimentos.map((alimento, index) => (
+                    <div key={`${alimento.id}-${index}`} className="alimento-item">
+                      <div className="alimento-info">
+                        <span className="alimento-nome">{alimento.nome}</span>
+                        <span className="alimento-quantidade">{alimento.quantidade}g</span>
+                      </div>
+                      <div className="alimento-nutrition">
+                        <span className="nutrition-value">{alimento.calorias} kcal</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="macros-summary">
-                  <span className="macro">P: {refeicao.totalProteinas}g</span>
-                  <span className="macro">C: {refeicao.totalCarboidratos}g</span>
-                  <span className="macro">G: {refeicao.totalGorduras}g</span>
+
+                <div className="refeicao-totals">
+                  <div className="total-item">
+                    <span className="total-label">Total:</span>
+                    <span className="total-calories">{totais.calorias} kcal</span>
+                  </div>
+                  <div className="macros-summary">
+                    <span className="macro">P: {totais.proteinas}g</span>
+                    <span className="macro">C: {totais.carboidratos}g</span>
+                    <span className="macro">G: {totais.gorduras}g</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
