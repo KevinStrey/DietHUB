@@ -55,12 +55,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15), 0 1.5px 4px rgba(44, 62, 80, 0.08);
 }
 
 .add-refeicao-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.22), 0 2px 8px rgba(44, 62, 80, 0.12);
 }
 
 /* Resumo Diário */
@@ -182,6 +182,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15), 0 1.5px 4px rgba(44, 62, 80, 0.08);
 }
 
 .action-button.edit {
@@ -311,11 +312,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15), 0 1.5px 4px rgba(44, 62, 80, 0.08);
 }
 
 .add-first-refeicao:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.22), 0 2px 8px rgba(44, 62, 80, 0.12);
 }
 
 /* Loading */
@@ -398,11 +400,13 @@
   justify-content: center;
   border-radius: 50%;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15), 0 1.5px 4px rgba(44, 62, 80, 0.08);
 }
 
 .close-button:hover {
   background: #ffebee;
   color: #e74c3c;
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.22), 0 2px 8px rgba(44, 62, 80, 0.12);
 }
 
 .modal-content {
@@ -466,18 +470,20 @@
 
 .add-button {
   padding: 0.75rem;
-  background: #27ae60;
+  background: #4ecd70;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15), 0 1.5px 4px rgba(44, 62, 80, 0.08);
 }
 
 .add-button:hover {
   background: #229954;
   transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.22), 0 2px 8px rgba(44, 62, 80, 0.12);
 }
 
 .alimentos-list h4 {
@@ -505,10 +511,12 @@
   padding: 0.25rem;
   border-radius: 4px;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15), 0 1.5px 4px rgba(44, 62, 80, 0.08);
 }
 
 .remove-button:hover {
   background: #ffebee;
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.22), 0 2px 8px rgba(44, 62, 80, 0.12);
 }
 
 .totals-preview {
@@ -569,6 +577,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15), 0 1.5px 4px rgba(44, 62, 80, 0.08);
 }
 
 .cancel-button {
@@ -579,6 +588,7 @@
 
 .cancel-button:hover {
   background: #e9ecef;
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.22), 0 2px 8px rgba(44, 62, 80, 0.12);
 }
 
 .save-button {
@@ -588,7 +598,7 @@
 
 .save-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.22), 0 2px 8px rgba(44, 62, 80, 0.12);
 }
 
 /* Responsividade */

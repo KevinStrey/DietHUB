@@ -1,6 +1,6 @@
 # DietHub Frontend
 
-Interface gráfica React.js para o sistema DietHub com funcionalidades CRUD completas.
+Interface gráfica React.js para o sistema DietHub, focada em controle nutricional, refeições e alimentos.
 
 ## 🚀 Como executar
 
@@ -32,7 +32,10 @@ frontend/
 │   │   ├── AlimentoDetail.jsx    # Detalhes de um alimento
 │   │   ├── AlimentoDetail.css    # Estilos dos detalhes
 │   │   ├── AlimentoForm.jsx      # Formulário para adicionar/editar
-│   │   └── AlimentoForm.css      # Estilos do formulário
+│   │   ├── Refeicoes.jsx         # Gerenciamento de refeições
+│   │   ├── Refeicoes.css         # Estilos das refeições
+│   │   ├── Nutrition.jsx         # Resumo nutricional diário
+│   │   ├── Profile.jsx           # Perfil do usuário
 │   ├── App.jsx                   # Componente principal com roteamento
 │   ├── App.css                   # Estilos da aplicação
 │   ├── main.jsx                  # Ponto de entrada
@@ -48,45 +51,27 @@ O projeto está configurado para se comunicar com o backend Spring Boot na porta
 ## 📱 Funcionalidades Implementadas
 
 ### 🍎 Gestão de Alimentos (CRUD Completo)
+- Listagem de alimentos cadastrados
+- Busca em tempo real por nome
+- Visualização detalhada de cada alimento
+- Adição, edição e exclusão de alimentos com validação de dados
 
-#### 1. **Lista de Alimentos** (`/alimentos`)
-- ✅ Exibe todos os alimentos cadastrados
-- ✅ Busca em tempo real por nome
-- ✅ Cards com informações nutricionais
-- ✅ Botões de ação (Ver, Editar, Excluir)
+### 🍽️ Gestão de Refeições
+- Cadastro de refeições diárias para o usuário logado
+- Adição de múltiplos alimentos em cada refeição, com quantidade em gramas
+- Edição e exclusão de refeições
+- Atualização automática do histórico nutricional ao modificar refeições
+- Visualização das refeições do dia selecionado
 
-#### 2. **Detalhes do Alimento** (`/alimentos/:id`)
-- ✅ Visualização completa das informações
-- ✅ Cards visuais para macronutrientes
-- ✅ Resumo nutricional detalhado
-- ✅ Botões de ação (Editar, Excluir)
+### 🥗 Nutrição (Resumo Diário)
+- Exibição dos totais diários de calorias, proteínas, carboidratos e gorduras
+- Resumo visual dos macronutrientes consumidos no dia
+- Navegação por datas para consultar o histórico nutricional
 
-#### 3. **Adicionar Alimento** (`/alimentos/novo`)
-- ✅ Formulário completo com validação
-- ✅ Campos para nome, calorias, proteínas, carboidratos, gorduras
-- ✅ Validação em tempo real
-- ✅ Feedback visual de erros
-
-#### 4. **Editar Alimento** (`/alimentos/:id/editar`)
-- ✅ Formulário pré-preenchido com dados existentes
-- ✅ Mesma validação do formulário de adição
-- ✅ Atualização em tempo real
-
-#### 5. **Excluir Alimento**
-- ✅ Modal de confirmação
-- ✅ Exclusão segura com confirmação
-- ✅ Atualização automática da lista
-
-#### 6. **Busca de Alimentos**
-- ✅ Campo de busca em tempo real
-- ✅ Filtragem por nome do alimento
-- ✅ Interface responsiva
-
-### 🏠 Outras Funcionalidades
-- **Dashboard**: Visão geral das estatísticas nutricionais
-- **Refeições**: Gerenciamento de refeições diárias
-- **Nutrição**: Análise detalhada de macronutrientes
-- **Perfil**: Informações do usuário
+### 👤 Perfil do Usuário
+- Visualização dos dados do usuário logado
+- Exibição de metas nutricionais diárias
+- Opção de logout
 
 ## 🎨 Design
 
@@ -97,6 +82,7 @@ Interface moderna com:
 - Paleta de cores consistente
 - Loading states e feedback visual
 - Modais e confirmações elegantes
+- Botões com efeito de sombra
 
 ## 🔌 API Endpoints Utilizados
 
@@ -105,6 +91,11 @@ Interface moderna com:
 - `POST /api/alimentos` - Criar novo alimento
 - `PUT /api/alimentos/{id}` - Atualizar alimento
 - `DELETE /api/alimentos/{id}` - Excluir alimento
+- `GET /api/refeicoes/usuario/{usuarioId}` - Listar refeições do usuário
+- `POST /api/refeicoes` - Criar refeição
+- `PUT /api/refeicoes/{id}` - Atualizar refeição
+- `DELETE /api/refeicoes/{id}` - Excluir refeição
+- `GET /api/historico/usuario/{usuarioId}/data/{data}` - Buscar resumo nutricional diário
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -122,10 +113,46 @@ A interface é totalmente responsiva e funciona perfeitamente em:
 - Tablet (768px - 1199px)
 - Mobile (< 768px)
 
-## 🚀 Próximos Passos
+## 🗄️ Configuração do Banco de Dados
 
-- [ ] Implementar autenticação de usuários
-- [ ] Adicionar gráficos e visualizações
-- [ ] Implementar gestão de refeições
-- [ ] Adicionar histórico nutricional
-- [ ] Implementar metas e objetivos
+O backend espera um banco de dados PostgreSQL com as seguintes configurações (veja em `hub/src/main/resources/application.properties`):
+
+- **Host:** localhost
+- **Porta:** 5432
+- **Nome do banco:** diethub
+- **Usuário:** postgres
+- **Senha:** aluno
+
+Exemplo de configuração:
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/diethub
+spring.datasource.username=postgres
+spring.datasource.password=aluno
+```
+
+O Hibernate está configurado para atualizar o schema automaticamente:
+```
+spring.jpa.hibernate.ddl-auto=update
+```
+
+## 🌱 Seed Inicial do Banco de Dados
+
+Para facilitar os testes, há um script SQL de seed localizado em:
+
+- `frontend/alimentos_refeicoes_seed.sql`
+
+Esse script:
+- Cria dois usuários (admin e user)
+- Popula a tabela de alimentos com 20 exemplos
+- Cria refeições e itens de refeição para vários dias
+
+**Como usar:**
+1. Certifique-se de que o banco de dados `diethub` existe e está vazio.
+2. Execute o script no seu PostgreSQL:
+   - Via linha de comando:
+     ```
+     psql -U postgres -d diethub -f frontend/alimentos_refeicoes_seed.sql
+     ```
+   - Ou usando uma ferramenta gráfica (DBeaver, PgAdmin, etc).
+
+Pronto! O banco estará populado para uso imediato no app DietHub.

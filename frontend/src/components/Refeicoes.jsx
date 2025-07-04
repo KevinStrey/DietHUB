@@ -415,7 +415,6 @@ function Refeicoes() {
 function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
   const [formData, setFormData] = useState({
     nome: refeicao?.nome || '',
-    horario: refeicao?.horario || '12:00',
     alimentos: refeicao?.alimentos ? [...refeicao.alimentos] : []
   });
 
@@ -503,14 +502,6 @@ function RefeicaoModal({ refeicao, alimentos, onSave, onCancel }) {
                 onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
                 placeholder="Ex: Café da Manhã"
                 readOnly={!!refeicao}
-              />
-            </div>
-            <div className="form-group">
-              <label>Horário</label>
-              <input
-                type="time"
-                value={formData.horario}
-                onChange={(e) => setFormData(prev => ({ ...prev, horario: e.target.value }))}
               />
             </div>
           </div>

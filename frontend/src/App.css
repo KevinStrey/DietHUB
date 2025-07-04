@@ -59,6 +59,13 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
+  text-decoration: none;
+}
+
+.nav-button:visited,
+.nav-button:active,
+.nav-button:focus {
+  text-decoration: none;
 }
 
 .nav-button:hover {
