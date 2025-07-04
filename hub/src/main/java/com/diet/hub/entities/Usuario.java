@@ -2,6 +2,7 @@ package com.diet.hub.entities;
 
 import jakarta.persistence.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "Usuario")
@@ -29,6 +30,7 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Refeicao> refeicoes;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<HistoricoDiario> historicos;
 

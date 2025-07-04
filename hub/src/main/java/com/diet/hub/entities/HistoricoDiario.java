@@ -2,6 +2,7 @@ package com.diet.hub.entities;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "HistoricoDiario")
@@ -26,6 +27,7 @@ public class HistoricoDiario {
     @Column(name = "totalGorduras")
     private Double totalGorduras;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;

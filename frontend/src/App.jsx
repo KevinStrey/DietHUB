@@ -4,10 +4,31 @@ import AlimentoList from './components/AlimentoList'
 import AlimentoDetail from './components/AlimentoDetail'
 import AlimentoForm from './components/AlimentoForm'
 import Profile from './components/Profile'
+import Refeicoes from './components/Refeicoes'
+import Nutrition from './components/Nutrition'
+import Login from './components/Login'
 import './App.css'
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [user, setUserState] = useState(() => {
+    const saved = localStorage.getItem('user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  // Função para login
+  const setUser = (usuario) => {
+    setUserState(usuario);
+    if (usuario) {
+      localStorage.setItem('user', JSON.stringify(usuario));
+    } else {
+      localStorage.removeItem('user');
+    }
+  };
+
+  if (!user) {
+    return <Login onLogin={setUser} />
+  }
 
   return (
     <Router>
@@ -17,33 +38,35 @@ function App() {
           <div className="header-content">
             <h1 className="logo">🍎 DietHub</h1>
             <nav className="nav">
-              <Link 
+              <Link
                 to="/"
                 className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
                 onClick={() => setActiveTab('dashboard')}
               >
                 Dashboard
               </Link>
-              <Link 
+              <Link
                 to="/alimentos"
                 className={`nav-button ${activeTab === 'alimentos' ? 'active' : ''}`}
                 onClick={() => setActiveTab('alimentos')}
               >
                 Alimentos
               </Link>
-              <button 
-                className={`nav-button ${activeTab === 'meals' ? 'active' : ''}`}
-                onClick={() => setActiveTab('meals')}
+              <Link
+                to="/refeicoes"
+                className={`nav-button ${activeTab === 'refeicoes' ? 'active' : ''}`}
+                onClick={() => setActiveTab('refeicoes')}
               >
                 Refeições
-              </button>
-              <button 
+              </Link>
+              <Link
+                to="/nutrition"
                 className={`nav-button ${activeTab === 'nutrition' ? 'active' : ''}`}
                 onClick={() => setActiveTab('nutrition')}
               >
                 Nutrição
-              </button>
-              <Link 
+              </Link>
+              <Link
                 to="/profile"
                 className={`nav-button ${activeTab === 'profile' ? 'active' : ''}`}
                 onClick={() => setActiveTab('profile')}
@@ -92,66 +115,14 @@ function App() {
             <Route path="/alimentos/:id" element={<AlimentoDetail />} />
             <Route path="/alimentos/:id/editar" element={<AlimentoForm />} />
 
+            {/* Rota para Refeições */}
+            <Route path="/refeicoes" element={<Refeicoes />} />
+
             {/* Rota para Perfil */}
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<Profile user={user} onLogout={() => setUser(null)} />} />
 
-            {/* Outras rotas (mantidas como antes) */}
-            <Route path="/meals" element={
-              <div className="meals">
-                <h2>Refeições</h2>
-                <div className="meals-grid">
-                  <div className="meal-card">
-                    <h3>🍳 Café da Manhã</h3>
-                    <p>Ovos, aveia, banana</p>
-                    <span className="calories">450 cal</span>
-                  </div>
-                  <div className="meal-card">
-                    <h3>🥗 Almoço</h3>
-                    <p>Frango, arroz, legumes</p>
-                    <span className="calories">650 cal</span>
-                  </div>
-                  <div className="meal-card">
-                    <h3>🍎 Lanche</h3>
-                    <p>Iogurte, nozes</p>
-                    <span className="calories">200 cal</span>
-                  </div>
-                  <div className="meal-card">
-                    <h3>🐟 Jantar</h3>
-                    <p>Salmão, quinoa, vegetais</p>
-                    <span className="calories">550 cal</span>
-                  </div>
-                </div>
-              </div>
-            } />
-
-            <Route path="/nutrition" element={
-              <div className="nutrition">
-                <h2>Informações Nutricionais</h2>
-                <div className="nutrition-chart">
-                  <div className="macro-bar">
-                    <div className="macro-label">Proteínas</div>
-                    <div className="macro-progress">
-                      <div className="macro-fill protein" style={{width: '70%'}}></div>
-                    </div>
-                    <div className="macro-value">85g / 120g</div>
-                  </div>
-                  <div className="macro-bar">
-                    <div className="macro-label">Carboidratos</div>
-                    <div className="macro-progress">
-                      <div className="macro-fill carbs" style={{width: '88%'}}></div>
-                    </div>
-                    <div className="macro-value">220g / 250g</div>
-                  </div>
-                  <div className="macro-bar">
-                    <div className="macro-label">Gorduras</div>
-                    <div className="macro-progress">
-                      <div className="macro-fill fats" style={{width: '93%'}}></div>
-                    </div>
-                    <div className="macro-value">65g / 70g</div>
-                  </div>
-                </div>
-              </div>
-            } />
+            {/* Rota para Nutrição */}
+            <Route path="/nutrition" element={<Nutrition />} />
           </Routes>
         </main>
       </div>

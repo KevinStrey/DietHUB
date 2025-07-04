@@ -206,7 +206,7 @@ body {
 
 .macro-fill.protein {
   background: linear-gradient(90deg, #ff6b6b, #ee5a24);
-}
+  }
 
 .macro-fill.carbs {
   background: linear-gradient(90deg, #4ecdc4, #44a08d);
@@ -214,7 +214,7 @@ body {
 
 .macro-fill.fats {
   background: linear-gradient(90deg, #feca57, #ff9ff3);
-}
+  }
 
 .macro-value {
   min-width: 80px;
@@ -282,8 +282,8 @@ body {
   
   .stats-grid {
     grid-template-columns: 1fr;
-  }
-  
+}
+
   .meals-grid {
     grid-template-columns: 1fr;
   }
@@ -291,8 +291,8 @@ body {
   .profile-info {
     flex-direction: column;
     text-align: center;
-  }
-  
+}
+
   .macro-bar {
     flex-direction: column;
     align-items: stretch;
