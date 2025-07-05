@@ -2,6 +2,8 @@
 
 Interface gráfica React.js para o sistema DietHub, focada em controle nutricional, refeições e alimentos.
 
+Vídeo no YouTube: [DieHUB](https://youtu.be/UzU0_aml8w0)
+
 ## 🚀 Como executar
 
 ### Pré-requisitos
