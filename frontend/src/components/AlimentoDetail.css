@@ -139,6 +139,10 @@
   font-size: 1.1rem;
 }
 
+p.nutrition-value {
+  color: white;
+}
+
 .nutrition-value {
   margin: 0;
   font-size: 1.5rem;
